@@ -78,7 +78,7 @@ void *mm_malloc(size_t size)
 		size_t* p = mem_sbrk(newsize);
 		if (p == (void*) -1)
 			return NULL;
-		*p = newsize; 
+		*p = size; 
 		*p = 0x3 | *p;
 		return (void*) (char*) p + SIZE_T_SIZE;		
 	}
@@ -86,8 +86,8 @@ void *mm_malloc(size_t size)
 	void* temp = mem_heap_lo; 
 	size_t * T = temp;
 	
+	printf("%zu malloc\n",*T );	
 	//T -= SIZE_T_SIZE;  	
-//	printf("%zu malloc\n",*T );	
 	while ((*T & 0x2)  != 0x2){
 		//size_t actualsize = *T & 0x7FFF; 
 		//printf("testing\n\n");
@@ -100,7 +100,7 @@ void *mm_malloc(size_t size)
 	}
 
 	if ((*T & 0x2) == 0x2){
-		*T = *T & 0xFFFFFFFD; //  *T &  1111...1101 
+		*T = *T & 0xFFFFFFFD; //  *T &  1111...1100 
 	}
 	//printf("%zu\n", newsize);
 	size_t* p = mem_sbrk(newsize);
@@ -108,7 +108,7 @@ void *mm_malloc(size_t size)
 //	*q = 0xFFFFFFFF;   
 	if (p == (void *) -1)
 		return NULL;
-	*p = newsize;
+	*p = size;
 	
 	*p = 0x3 | *p; //put 1's in the 0th and 1st index bits... 0th index for allocated vs not allocated... 1st index bit for "last part of heap?"
 	return (void*) (char *) p + SIZE_T_SIZE;	
@@ -124,7 +124,7 @@ void mm_free(void *ptr)
 	size_t* temp = ptr;
 	temp -= SIZE_T_SIZE;  
 	*temp = 0xfffffffe & *temp ;  	
-	 
+	ptr = temp;  
 }
 
 /*
